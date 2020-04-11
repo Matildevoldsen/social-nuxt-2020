@@ -1,5 +1,8 @@
 <template>
     <form class="box m-t-50" @submit.prevent="submit">
+      <b-notification type="is-danger" v-if="errors">
+        {{ errors }}
+      </b-notification>
       <h1 class="title">Sign In</h1>
       <b-field label="E-mail Address">
         <b-input type="email" required v-model="form.email"/>
@@ -9,7 +12,7 @@
       </b-field>
       <p>Haven't signed up yet? Please sign up <n-link to="/auth/signup">here</n-link></p>
       <hr/>
-      <b-button type="is-primary">Sign In</b-button>
+      <b-button @click="submit" type="is-primary">Sign In</b-button>
     </form>
 </template>
 <script>
@@ -19,12 +22,20 @@
         form: {
           email: '',
           password: ''
-        }
+        },
+        errors: null
       }
     },
     methods: {
-      submit() {
+      async submit() {
+        try {
+          await this.$axios.$get('/sanctum/csrf-cookie');
+          await this.$auth.loginWith('local', { data: this.form })
 
+          this.$router.replace({ name: 'index' });
+        } catch (e) {
+          this.errors = 'Could not sign you with those credentials.'
+        }
       }
     }
   }

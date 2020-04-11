@@ -11,7 +11,7 @@
       </b-navbar-item>
     </template>
 
-    <template slot="end">
+    <template slot="end" v-if="$auth.loggedIn == false">
       <b-navbar-item tag="div">
         <div class="buttons">
           <n-link to="/auth/signup" class="button is-primary">
@@ -23,15 +23,28 @@
         </div>
       </b-navbar-item>
     </template>
-   <!-- <template>
-      <b-navbar-dropdown label="Name">
+    <template slot="end" v-if="$auth.loggedIn == true">
+      <b-navbar-dropdown :label="$auth.user.name">
         <b-navbar-item href="#">
           Edit Profile
         </b-navbar-item>
-        <b-navbar-item href="#">
+        <hr class="navbar-divider">
+        <b-navbar-item @click="signOut" href="#">
           Sign Out
         </b-navbar-item>
       </b-navbar-dropdown>
-    </template> -->
+
+    </template>
   </b-navbar>
 </template>
+<script>
+  export default {
+    methods: {
+      async signOut() {
+        await this.$auth.logout();
+
+        this.$router.replace({name: "index"});
+      }
+    }
+  }
+</script>

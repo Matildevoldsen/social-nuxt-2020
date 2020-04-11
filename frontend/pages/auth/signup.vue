@@ -13,9 +13,11 @@
     <b-field label="Confirm Password">
       <b-input type="password" required v-model="form.password_confirmation" password-reveal/>
     </b-field>
-    <p>Already got a user? Please sign in <n-link to="/auth/signin">here</n-link></p>
+    <p>Already got a user? Please sign in
+      <n-link to="/auth/signin">here</n-link>
+    </p>
     <hr/>
-    <b-button type="is-primary">Sign In</b-button>
+    <b-button @click="submit" type="is-primary">Sign In</b-button>
   </form>
 </template>
 <script>
@@ -31,8 +33,21 @@
       }
     },
     methods: {
-      submit() {
+      async submit() {
+        try {
+          await this.$axios.$get('/sanctum/csrf-cookie');
+          await this.$axios.$post('/api/register', {
+            name: this.form.name,
+            email: this.form.email,
+            password: this.form.password,
+            password_confirmation: this.form.password_confirmation
+          });
 
+          await this.$auth.loginWith('local', {data: this.form})
+          this.$router.replace({ name: 'index' });
+        } catch (e) {
+          this.errors = 'Whoops, something went wrong.'
+        }
       }
     }
   }
