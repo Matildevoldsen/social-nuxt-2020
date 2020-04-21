@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', 'API\Auth\RegisterController@store');
 
+Route::get('/user/{id}', 'API\User\UserController@view');
+Route::get('/users', 'API\User\UserController@index');
+Route::get('/users/posts/all', 'API\User\UserController@index');
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('auth:sanctum')->get('/user/posts', function (Request $request) {
+    return $request->user()->posts()->get();
+});
+
